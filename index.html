@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OceanData | Professional Visualizer</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Roboto+Mono:wght@400&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root { 
+            --google-blue: #1a73e8;
+            --glass: rgba(255, 255, 255, 0.1);
+            --border: rgba(255, 255, 255, 0.2);
+        }
+
+        body, html { 
+            margin: 0; padding: 0; font-family: 'Roboto', sans-serif; 
+            background: #000; color: white; overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        #landing-container { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; }
+
+        .landing-section {
+            height: 100vh; display: flex; flex-direction: column; 
+            justify-content: center; align-items: center; 
+            padding: 0 10%; box-sizing: border-box;
+            scroll-snap-align: start;
+            position: relative;
+            background-size: cover; background-position: center; background-attachment: fixed;
+        }
+
+        /* Hero */
+        #hero-main {
+            background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7)), 
+                              url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop');
+        }
+        h1 { font-size: 5rem; font-weight: 700; margin: 0; font-family: 'Inter'; }
+
+        /* Features */
+        #features { 
+            background-image: linear-gradient(rgba(3, 4, 94, 0.8), rgba(2, 62, 138, 0.9)), 
+                              url('https://images.unsplash.com/photo-1518467166778-b88f373ffec7?q=80&w=2072&auto=format&fit=crop');
+        }
+        .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 1200px; margin-top: 30px; }
+        .gee-card { background: var(--glass); border: 1px solid var(--border); border-radius: 12px; padding: 30px; backdrop-filter: blur(10px); }
+
+        /* Workflow */
+        #flow { 
+            background-image: linear-gradient(rgba(2, 62, 138, 0.9), rgba(0, 0, 0, 1)), 
+                              url('https://images.unsplash.com/photo-1439405326854-014607f694d7?q=80&w=2070&auto=format&fit=crop');
+        }
+        .flow-container { display: flex; align-items: center; gap: 20px; width: 100%; max-width: 1100px; }
+        .flow-box { 
+            background: rgba(255,255,255,0.05); border: 1px solid var(--border); 
+            padding: 30px; border-radius: 4px; flex: 1; text-align: center; 
+        }
+        .flow-icon { font-family: 'Roboto Mono'; color: var(--google-blue); font-size: 1.5rem; display: block; margin-bottom: 10px; }
+
+        /* Buttons */
+        .btn { padding: 14px 32px; border-radius: 4px; font-weight: 500; cursor: pointer; border: none; transition: 0.2s; }
+        .btn-main { background: var(--google-blue); color: white; }
+        .btn-outline { background: transparent; color: white; border: 1px solid white; margin-left: 10px; }
+
+        /* Portal */
+        #portal { display: none; padding: 40px; background: #f8f9fa; color: #202124; min-height: 100vh; }
+        .chart-row { background: white; padding: 20px; border-radius: 8px; border: 1px solid #dadce0; margin-bottom: 25px; height: 350px; }
+    </style>
+</head>
+<body>
+
+    <div id="landing-container">
+        <section class="landing-section" id="hero-main">
+            <h1>OceanData</h1>
+            <p>Planetary-scale oceanographic analysis platform.</p>
+            <div>
+                <button class="btn btn-main" onclick="openPortal()">Launch Explorer</button>
+                <button class="btn btn-outline">Documentation</button>
+            </div>
+        </section>
+
+        <section class="landing-section" id="features">
+            <h2 style="font-size: 2.5rem;">Advanced Marine Tools</h2>
+            <div class="feature-grid">
+                <div class="gee-card"><h3>01. Sea Level</h3><p>MSL computation with cloud algorithms.</p></div>
+                <div class="gee-card"><h3>02. Thermal</h3><p>High-precision thermal profiling.</p></div>
+                <div class="gee-card"><h3>03. Met-Ocean</h3><p>Wind & Pressure correlation.</p></div>
+            </div>
+        </section>
+
+        <section class="landing-section" id="flow">
+            <h2 style="font-size: 2.5rem;">System Pipeline</h2>
+            <div class="flow-container">
+                <div class="flow-box"><span class="flow-icon">DATA_IN</span><b>Ingestion</b></div>
+                <div style="color:var(--border)">──</div>
+                <div class="flow-box"><span class="flow-icon">COMPUTE</span><b>Processing</b></div>
+                <div style="color:var(--border)">──</div>
+                <div class="flow-box"><span class="flow-icon">OUTPUT</span><b>Visualize</b></div>
+            </div>
+        </section>
+    </div>
+
+    <section id="portal">
+        <h2 style="font-weight: 400; border-bottom: 1px solid #dadce0; padding-bottom: 20px;">Explorer Console</h2>
+        <div style="text-align: center; border: 2px dashed #dadce0; padding: 50px; border-radius: 8px; background: white; margin-bottom: 30px;">
+            <input type="file" id="fileInput" accept=".csv">
+            <button class="btn btn-main" onclick="runAnalysis()">Run Script</button>
+        </div>
+
+        <div id="results-area" style="display:none;">
+            <div style="display:flex; gap:20px; margin-bottom:30px;">
+                <div style="flex:1; background:white; padding:20px; border-radius:8px; border:1px solid #dadce0; text-align:center;">
+                    <small>MEAN SEA LEVEL</small><h2 id="m-msl" style="color:var(--google-blue)">0.00 m</h2>
+                </div>
+                <div style="flex:1; background:white; padding:20px; border-radius:8px; border:1px solid #dadce0; text-align:center;">
+                    <small>AVG TEMP</small><h2 id="m-temp" style="color:#fbbc04">0.00 °C</h2>
+                </div>
+            </div>
+            <div class="chart-row"><canvas id="cWater"></canvas></div>
+            <div class="chart-row"><canvas id="cTemp"></canvas></div>
+            <div class="chart-row"><canvas id="cWind"></canvas></div>
+            <div class="chart-row"><canvas id="cPress"></canvas></div>
+        </div>
+    </section>
+
+    <script>
+        function openPortal() {
+            document.getElementById('landing-container').style.display = 'none';
+            document.getElementById('portal').style.display = 'block';
+        }
+
+        function createChart(id, labels, datasets) {
+            const ctx = document.getElementById(id).getContext('2d');
+            if (window[id + 'Chart']) window[id + 'Chart'].destroy();
+            window[id + 'Chart'] = new Chart(ctx, {
+                type: 'line',
+                data: { labels: labels, datasets: datasets },
+                options: { responsive: true, maintainAspectRatio: false, elements: { point: { radius: 0 } } }
+            });
+        }
+
+        async function runAnalysis() {
+            const file = document.getElementById('fileInput').files[0];
+            if (!file) return alert("Select file!");
+            const fd = new FormData(); fd.append('file', file);
+            
+            const res = await fetch('/upload', { method: 'POST', body: fd });
+            const data = await res.json();
+            
+            if (data.error) return alert(data.error);
+
+            document.getElementById('results-area').style.display = 'block';
+            document.getElementById('m-msl').innerText = data.msl_val + " m";
+            document.getElementById('m-temp').innerText = data.stats.avg_temp + " °C";
+
+            createChart('cWater', data.time, [
+                { label: 'Water Level', data: data.water, borderColor: '#1a73e8' },
+                { label: 'MSL', data: data.msl_line, borderColor: 'red', borderDash: [5,5] }
+            ]);
+            createChart('cTemp', data.time, [{ label: 'Temp', data: data.temp, borderColor: '#fbbc04' }]);
+            createChart('cWind', data.time, [{ label: 'Wind', data: data.wind, borderColor: '#34a853' }]);
+            createChart('cPress', data.time, [{ label: 'Pressure', data: data.press, borderColor: '#8ab4f8' }]);
+        }
+    </script>
+</body>
+</html>
